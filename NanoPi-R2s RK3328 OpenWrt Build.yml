@@ -76,7 +76,7 @@ jobs:
         run: |
           mkdir friendlywrt-rk3328
           cd friendlywrt-rk3328
-          repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master -m rk3328.xml --repo-url=https://github.com/friendlyarm/repo --no-clone-bundle
+          repo init -u https://github.com/friendlyarm/friendlywrt_manifests -b master-v19.07.01 -m rk3328.xml --repo-url=https://github.com/friendlyarm/repo --no-clone-bundle
           repo sync -c --no-clone-bundle
           
         #下载lean大源码，复制lean文件夹到rk3328下，修改feeds.conf.defaul的源     
@@ -86,8 +86,8 @@ jobs:
           git clone https://github.com/coolsnowwolf/lede
           cd friendlywrt
           cp -r ../lede/package/lean package/
-          sed -i 's/https:\/\/github.com\/friendlyarm\/friendlywrt_project_luci^bb021b4b9097ad332ab40bce2a1c239d9fcf225b/https:\/\/github.com\/coolsnowwolf\/luci/' feeds.conf.default
-          sed -i 's/https:\/\/git.openwrt.org\/feed\/packages.git^54266c99b2a2e37a4c01b02ae74346874db7003c/https:\/\/github.com\/coolsnowwolf\/packages/' feeds.conf.default              
+          sed -i 's/https:\/\/github.com\/friendlyarm\/friendlywrt_project_luci^81580a3307e5a723ec4c01783de24e8e28c8cbd8/https:\/\/github.com\/coolsnowwolf\/luci/' feeds.conf.default
+          sed -i 's/https:\/\/github.com\/friendlyarm\/friendlywrt_project_packages^5b22f3f59c03412200fe4815d833943f953edf2b/https:\/\/github.com\/coolsnowwolf\/packages/' feeds.conf.default              
       
       - name: Update Target.mk
         run: |
