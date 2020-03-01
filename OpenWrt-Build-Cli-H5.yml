@@ -19,6 +19,11 @@ on:
   # release:
   #   types: [published]
 
+#环境变量：SSH_ACTIONS设置为true则会在执行完Costom Configure File后显示一个SSH的链接，可用终端或者web登录到vps进行配置
+env:
+  SSH_ACTIONS: true
+  TZ: Asia/Shanghai
+
 jobs:
 
   build:
@@ -36,6 +41,31 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
+          #以下这段命令是删除vps上的无用文件和软件，腾出空间供编译使用（初始可使用的空间为30G可能不够）
+          docker rmi `docker images -q`
+          echo "Deleting files, please wait ..."
+          sudo rm -rf \
+            /usr/share/dotnet \
+            /etc/mysql \
+            /etc/php
+          sudo -E apt-get -y purge \
+            azure-cli \
+            ghc* \
+            zulu* \
+            hhvm \
+            llvm* \
+            firefox \
+            google* \
+            dotnet* \
+            powershell \
+            openjdk* \
+            mysql* \
+            php*
+          #安装编译所需要的软件，安装编译环境
+          sudo -E apt-get update
+          sudo -E apt-get -y install bc build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex node-uglify gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint device-tree-compiler libuv-dev
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
           wget -O - https://raw.githubusercontent.com/friendlyarm/build-env-on-ubuntu-bionic/master/install.sh | bash         
           
       - name: Install Repo
@@ -90,6 +120,11 @@ jobs:
           rm -f ./.config*
           wget https://raw.githubusercontent.com/skytotwo/NanoPi-R1S-Build-By-Actions/master/r1s-h5-config
           cp r1s-h5-config .config
+
+      #如果环境变量设置为true,执行到此步骤时会弹出几行信息，上面有ssh的命令和https的链接，可选择在终端通过ssh链接修改配置或者通过web连接修改
+      - name: SSH connection to Actions
+        uses: P3TERX/debugger-action@master
+        if: env.SSH_ACTIONS == 'true'
       
       - name: Download package
         if: always()
